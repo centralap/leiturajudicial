@@ -1,0 +1,757 @@
+# Código HTML Completo Revisado — Leitura Judicial Inteligente
+
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Leitura Judicial Inteligente</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:
+radial-gradient(circle at top left,#163a7d 0%,transparent 30%),
+radial-gradient(circle at bottom right,#0b1d46 0%,transparent 30%),
+linear-gradient(135deg,#020817,#07152f,#0a1f4f);
+min-height:100vh;
+padding:20px;
+color:#fff;
+}
+
+.container{
+max-width:1600px;
+margin:auto;
+}
+
+.header{
+text-align:center;
+margin-bottom:20px;
+}
+
+.header h1{
+font-size:32px;
+font-weight:800;
+margin-bottom:6px;
+}
+
+.header p{
+color:#cbd5e1;
+font-size:14px;
+}
+
+.upload-card{
+background:rgba(7,18,40,0.85);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:24px;
+padding:24px;
+margin-bottom:18px;
+backdrop-filter:blur(10px);
+}
+
+.upload-area{
+border:2px dashed rgba(255,255,255,0.15);
+border-radius:18px;
+padding:50px 20px;
+text-align:center;
+cursor:pointer;
+transition:0.3s;
+}
+
+.upload-area:hover{
+background:rgba(255,255,255,0.03);
+border-color:#e3b64f;
+}
+
+.upload-area i{
+font-size:58px;
+color:#e3b64f;
+margin-bottom:16px;
+}
+
+.upload-area h2{
+font-size:24px;
+margin-bottom:8px;
+}
+
+.upload-area p{
+font-size:13px;
+color:#cbd5e1;
+}
+
+.btn{
+margin-top:18px;
+border:none;
+border-radius:12px;
+padding:12px 24px;
+font-weight:700;
+background:linear-gradient(135deg,#d7a53c,#ffd978);
+color:#07152f;
+cursor:pointer;
+}
+
+input[type=file]{
+display:none;
+}
+
+.progress-wrapper{
+margin-top:18px;
+}
+
+.progress{
+width:100%;
+height:12px;
+border-radius:999px;
+overflow:hidden;
+background:rgba(255,255,255,0.08);
+}
+
+.progress-bar{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#d7a53c,#ffe08a);
+transition:0.2s;
+}
+
+.status{
+margin-top:10px;
+font-size:13px;
+color:#dbe5f3;
+}
+
+.loader-box{
+display:flex;
+align-items:center;
+gap:12px;
+margin-top:18px;
+padding:14px;
+border-radius:14px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.08);
+}
+
+.loader-icon{
+width:58px;
+height:58px;
+border-radius:50%;
+border:4px solid rgba(255,255,255,0.15);
+border-top:4px solid #ffd978;
+animation:giro 1s linear infinite;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:700;
+font-size:12px;
+}
+
+.loader-icon.done{
+animation:none;
+border:4px solid #22c55e;
+color:#22c55e;
+}
+
+@keyframes giro{
+0%{transform:rotate(0deg);}
+100%{transform:rotate(360deg);}
+}
+
+.dashboard{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(340px,1fr));
+gap:16px;
+}
+
+.card{
+background:rgba(7,18,40,0.88);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:20px;
+padding:20px;
+}
+
+.card h3{
+font-size:16px;
+margin-bottom:16px;
+padding-bottom:10px;
+border-bottom:1px solid rgba(255,255,255,0.08);
+color:#ffd978;
+}
+
+.field{
+margin-bottom:16px;
+}
+
+.label{
+font-size:11px;
+color:#94a3b8;
+margin-bottom:5px;
+}
+
+.value{
+font-size:14px;
+font-weight:600;
+white-space:pre-wrap;
+word-break:break-word;
+}
+
+.raw-text{
+margin-top:20px;
+background:rgba(7,18,40,0.88);
+border-radius:20px;
+padding:20px;
+border:1px solid rgba(255,255,255,0.08);
+}
+
+.raw-text textarea{
+width:100%;
+min-height:220px;
+background:#07152f;
+border:1px solid rgba(255,255,255,0.08);
+border-radius:14px;
+padding:14px;
+color:white;
+resize:vertical;
+font-family:Inter;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+<h1>LEITURA JUDICIAL INTELIGENTE</h1>
+<p>Sistema avançado de extração automática de documentos judiciais</p>
+</div>
+
+<div class="upload-card">
+
+<label class="upload-area" for="fileInput">
+
+<i class="fa-solid fa-file-arrow-up"></i>
+
+<h2>Enviar Documento</h2>
+
+<p>
+PDF, imagem, alvará, mandado, decisão judicial ou despacho
+</p>
+
+<button type="button" class="btn">
+Selecionar Documento
+</button>
+
+</label>
+
+<input type="file" id="fileInput" accept="image/*,.pdf">
+
+<div class="progress-wrapper">
+
+<div class="progress">
+<div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="status" id="status">
+Aguardando documento...
+</div>
+
+</div>
+
+<div class="loader-box">
+
+<div class="loader-icon" id="loaderIcon">
+0%
+</div>
+
+<div id="loaderText">
+Aguardando leitura...
+</div>
+
+</div>
+
+</div>
+
+<div class="dashboard">
+
+<div class="card">
+
+<h3>Dados da Pessoa</h3>
+
+<div class="field">
+<div class="label">NOME</div>
+<div class="value" id="nome">---</div>
+</div>
+
+<div class="field">
+<div class="label">CPF</div>
+<div class="value" id="cpf">---</div>
+</div>
+
+<div class="field">
+<div class="label">RG</div>
+<div class="value" id="rg">---</div>
+</div>
+
+<div class="field">
+<div class="label">DATA DE NASCIMENTO</div>
+<div class="value" id="nascimento">---</div>
+</div>
+
+<div class="field">
+<div class="label">FILIAÇÃO</div>
+<div class="value" id="filiacao">---</div>
+</div>
+
+</div>
+
+<div class="card">
+
+<h3>Dados Processuais</h3>
+
+<div class="field">
+<div class="label">NÚMERO DO PROCESSO</div>
+<div class="value" id="processo">---</div>
+</div>
+
+<div class="field">
+<div class="label">NÚMERO DO ALVARÁ</div>
+<div class="value" id="alvara">---</div>
+</div>
+
+<div class="field">
+<div class="label">ENDEREÇO</div>
+<div class="value" id="endereco">---</div>
+</div>
+
+<div class="field">
+<div class="label">RESTRIÇÕES IMPOSTAS</div>
+<div class="value" id="restricoes">---</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="raw-text">
+
+<h3 style="margin-bottom:12px;color:#ffd978;">
+Síntese da Decisão
+</h3>
+
+<textarea id="textoExtraido"></textarea>
+
+</div>
+
+</div>
+
+<script>
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+const fileInput = document.getElementById('fileInput');
+const progressBar = document.getElementById('progressBar');
+const status = document.getElementById('status');
+const loaderIcon = document.getElementById('loaderIcon');
+const loaderText = document.getElementById('loaderText');
+
+fileInput.addEventListener('change', async function(e){
+
+const file = e.target.files[0];
+
+if(!file) return;
+
+resetarCampos();
+
+status.innerText = 'Processando documento...';
+loaderText.innerText = 'Iniciando leitura...';
+loaderIcon.classList.remove('done');
+loaderIcon.innerText = '0%';
+progressBar.style.width = '0%';
+
+try{
+
+let texto = '';
+
+if(file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')){
+texto = await lerPDF(file);
+}else{
+texto = await lerImagem(file);
+}
+
+if(!texto || texto.trim().length < 5){
+throw new Error('Nenhum texto encontrado');
+}
+
+texto = normalizarTexto(texto);
+
+analisarDocumento(texto);
+
+loaderIcon.classList.add('done');
+loaderIcon.innerText = '✓';
+loaderText.innerText = 'Documento lido com sucesso';
+status.innerText = 'Leitura concluída';
+progressBar.style.width = '100%';
+
+}catch(erro){
+
+console.error(erro);
+loaderIcon.innerText = '!';
+loaderText.innerText = 'Erro ao processar';
+status.innerText = erro.message;
+
+}
+
+});
+
+function atualizarProgresso(valor,texto='Lendo documento...'){
+
+const pct = Math.round(valor);
+
+progressBar.style.width = pct + '%';
+loaderIcon.innerText = pct + '%';
+loaderText.innerText = texto;
+
+}
+
+async function lerImagem(file){
+
+const resultado = await Tesseract.recognize(file,'por',{
+logger: m => {
+if(m.progress){
+atualizarProgresso(m.progress * 100,'Fazendo OCR da imagem...');
+}
+}
+});
+
+return resultado.data.text;
+
+}
+
+async function lerPDF(file){
+
+const buffer = await file.arrayBuffer();
+
+const pdf = await pdfjsLib.getDocument({
+data:buffer
+}).promise;
+
+let textoFinal = '';
+
+for(let pagina=1; pagina<=pdf.numPages; pagina++){
+
+loaderText.innerText = 'Processando página ' + pagina;
+
+const page = await pdf.getPage(pagina);
+
+const textContent = await page.getTextContent();
+
+const textoNativo = textContent.items
+.map(item => item.str)
+.join(' ');
+
+if(textoNativo && textoNativo.trim().length > 30){
+
+textoFinal += '\n' + textoNativo;
+
+}else{
+
+const viewport = page.getViewport({scale:2});
+
+const canvas = document.createElement('canvas');
+const ctx = canvas.getContext('2d');
+
+canvas.width = viewport.width;
+canvas.height = viewport.height;
+
+await page.render({
+canvasContext:ctx,
+viewport:viewport
+}).promise;
+
+const imagem = canvas.toDataURL('image/png');
+
+const resultadoOCR = await Tesseract.recognize(imagem,'por',{
+logger: m => {
+if(m.progress){
+atualizarProgresso(m.progress * 100,'OCR página ' + pagina);
+}
+}
+});
+
+textoFinal += '\n' + resultadoOCR.data.text;
+
+}
+
+}
+
+return textoFinal;
+
+}
+
+function normalizarTexto(texto){
+
+return texto
+.replace(/\r/g,' ')
+.replace(/\n/g,' ')
+.replace(/\s+/g,' ')
+.trim();
+
+}
+
+function set(id,valor){
+
+if(valor && valor.trim() !== ''){
+document.getElementById(id).innerText = valor.trim();
+}
+
+}
+
+function extrair(regexList,texto){
+
+for(let regex of regexList){
+
+const resultado = texto.match(regex);
+
+if(resultado && resultado[1]){
+return resultado[1].trim();
+}
+
+}
+
+return '';
+
+}
+
+function analisarDocumento(texto){
+
+// NOME
+
+const nome = extrair([
+/Nome da Pessoa[:\s]*([A-ZÀ-Ú\s]+)/i,
+/Nome[:\s]*([A-ZÀ-Ú\s]+)/i
+],texto);
+
+if(nome){
+set('nome',nome.replace(/CPF.*/i,'').trim());
+}
+
+// CPF
+
+const cpf = texto.match(/\d{3}\.\d{3}\.\d{3}-\d{2}/);
+
+if(cpf){
+set('cpf',cpf[0]);
+}
+
+// RG
+
+const rg = extrair([
+/RG[:\s]*([\d\.\-A-Z]+)/i
+],texto);
+
+if(rg){
+set('rg',rg);
+}
+
+// NASCIMENTO
+
+const nascimento = extrair([
+/Data\s*de\s*Nascimento[:\s]*(\d{2}\/\d{2}\/\d{4})/i,
+/Nascimento[:\s]*(\d{2}\/\d{2}\/\d{4})/i,
+/nascido\s*em\s*(\d{2}\/\d{2}\/\d{4})/i
+],texto);
+
+if(nascimento){
+set('nascimento',nascimento);
+}
+
+// PROCESSO
+
+const processo = extrair([
+/N[º°o]?\s*do\s*processo[:\s]*([\d\.\-]+)/i,
+/Processo[:\s]*([\d\.\-]+)/i,
+/(\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4})/
+],texto);
+
+if(processo){
+set('processo',processo);
+}
+
+// ALVARÁ
+
+const alvara = extrair([
+/N[º°o]?\s*do\s*Alvar[aá][:\s]*([\d\.\-]+)/i,
+/Alvar[aá][:\s]*([\d\.\-]+)/i
+],texto);
+
+if(alvara){
+set('alvara',alvara);
+}
+
+// ENDEREÇO
+
+const endereco = extrair([
+/Endere[cç]o[:\s]*(.*?)(?:Informações Processuais|CEP|Bairro|$)/i
+],texto);
+
+if(endereco){
+set('endereco',endereco);
+}
+
+// FILIAÇÃO
+
+const filiacao = texto.match(/Filiação[:\s]*(.*?)\s*Marcas e sinais:/i);
+
+if(filiacao){
+
+let textoFilho = filiacao[1]
+.replace(/\s+/g,' ')
+.trim();
+
+const mae = textoFilho.match(/([A-ZÀ-Ú\s]+)\(mãe\)/i);
+const pai = textoFilho.match(/([A-ZÀ-Ú\s]+)\(pai\)/i);
+
+let resultado = '';
+
+if(mae){
+resultado += mae[1].trim();
+}
+
+if(pai){
+if(resultado){
+resultado += '\n';
+}
+resultado += pai[1].trim();
+}
+
+set('filiacao',resultado);
+
+}
+
+// SÍNTESE
+
+const sinteseCompleta = texto.match(
+/Síntese da Decisão(.*?)(?:Certidão|Mandado|Observações|Documento assinado|$)/i
+);
+
+if(sinteseCompleta){
+
+let decisao = sinteseCompleta[1]
+.trim()
+.replace(/\s+/g,' ');
+
+// LIMITADOR PARA NÃO EXIBIR TEXTO GIGANTE
+
+if(decisao.length > 4000){
+decisao = decisao.substring(0,4000);
+}
+
+document.getElementById('textoExtraido').value = decisao;
+
+// RESTRIÇÕES
+
+let regras = '';
+const textoRestricao = decisao.toLowerCase();
+
+if(textoRestricao.includes('tornozeleira') || textoRestricao.includes('monitoramento eletrônico')){
+regras += '• Uso de monitoramento eletrônico\n';
+}
+
+if(textoRestricao.includes('prisão domiciliar') || textoRestricao.includes('recolhimento domiciliar')){
+regras += '• Recolhimento domiciliar\n';
+}
+
+const horario = decisao.match(/(\d{1,2}h?\s*(?:às|as|a)\s*\d{1,2}h?)/i);
+
+if(horario){
+regras += '• Horário de restrição: ' + horario[1] + '\n';
+}
+
+const dias = decisao.match(
+/segunda.*?sexta-feira|segunda.*?sexta|finais de semana|final de semana|sábado.*?domingo/gi
+);
+
+if(dias){
+regras += '• Dias aplicados: ' + dias.join(', ') + '\n';
+}
+
+if(
+textoRestricao.includes('não poderá sair') ||
+textoRestricao.includes('proibido sair') ||
+textoRestricao.includes('vedado ausentar-se')
+){
+regras += '• Restrição de saída da residência\n';
+}
+
+const saida = decisao.match(
+/poder[aá]\s+sair\s+para\s+(.*?)(?:\.|\,|\;)/i
+);
+
+if(saida){
+regras += '• Permitido sair para: ' + saida[1].trim() + '\n';
+}
+
+if(textoRestricao.includes('comparecimento')){
+regras += '• Comparecimento obrigatório em juízo\n';
+}
+
+if(textoRestricao.includes('proibição de manter contato')){
+regras += '• Proibido manter contato com vítimas/testemunhas\n';
+}
+
+if(regras.trim() === ''){
+regras = 'Nenhuma restrição identificada';
+}
+
+set('restricoes',regras);
+
+}
+
+}
+
+function resetarCampos(){
+
+const campos = [
+'nome',
+'cpf',
+'rg',
+'nascimento',
+'filiacao',
+'processo',
+'alvara',
+'endereco',
+'restricoes'
+];
+
+campos.forEach(id=>{
+document.getElementById(id).innerText = '---';
+});
+
+document.getElementById('textoExtraido').value = '';
+
+}
+
+</script>
+
+</body>
+</html>
